@@ -1,0 +1,15 @@
+C:\Users\OwenT\Documents\GitHub\IracingOverlay\IracingOverlay\bin\Debug\IracingOverlay.exe.config
+C:\Users\OwenT\Documents\GitHub\IracingOverlay\IracingOverlay\bin\Debug\IracingOverlay.exe
+C:\Users\OwenT\Documents\GitHub\IracingOverlay\IracingOverlay\bin\Debug\IracingOverlay.pdb
+C:\Users\OwenT\Documents\GitHub\IracingOverlay\IracingOverlay\obj\Debug\IracingOverlay.csproj.AssemblyReference.cache
+C:\Users\OwenT\Documents\GitHub\IracingOverlay\IracingOverlay\obj\Debug\MainWindow.g.cs
+C:\Users\OwenT\Documents\GitHub\IracingOverlay\IracingOverlay\obj\Debug\App.g.cs
+C:\Users\OwenT\Documents\GitHub\IracingOverlay\IracingOverlay\obj\Debug\IracingOverlay_MarkupCompile.cache
+C:\Users\OwenT\Documents\GitHub\IracingOverlay\IracingOverlay\obj\Debug\IracingOverlay_MarkupCompile.lref
+C:\Users\OwenT\Documents\GitHub\IracingOverlay\IracingOverlay\obj\Debug\MainWindow.baml
+C:\Users\OwenT\Documents\GitHub\IracingOverlay\IracingOverlay\obj\Debug\IracingOverlay.g.resources
+C:\Users\OwenT\Documents\GitHub\IracingOverlay\IracingOverlay\obj\Debug\IracingOverlay.Properties.Resources.resources
+C:\Users\OwenT\Documents\GitHub\IracingOverlay\IracingOverlay\obj\Debug\IracingOverlay.csproj.GenerateResource.cache
+C:\Users\OwenT\Documents\GitHub\IracingOverlay\IracingOverlay\obj\Debug\IracingOverlay.csproj.CoreCompileInputs.cache
+C:\Users\OwenT\Documents\GitHub\IracingOverlay\IracingOverlay\obj\Debug\IracingOverlay.exe
+C:\Users\OwenT\Documents\GitHub\IracingOverlay\IracingOverlay\obj\Debug\IracingOverlay.pdb

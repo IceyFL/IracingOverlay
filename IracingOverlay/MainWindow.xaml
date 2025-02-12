@@ -7,6 +7,12 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-        
+        <TextBlock Text="Distance: 99.9s" 
+                   Name="Delta"
+                   FontSize="24" 
+                   Foreground="Black" 
+                   HorizontalAlignment="Center" 
+                   VerticalAlignment="Center" />
     </Grid>
 </Window>
+

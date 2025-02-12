@@ -81,8 +81,10 @@ namespace IracingOverlay
 
         private void OnTelemetryData()
         {
+            //get delta to 6th car
             var lapDistPct = irsdk.Data.GetFloat("CarIdxLapDistPct", 5);
 
+            //Update Delta on Window
             Dispatcher.Invoke(() =>
             {
                 Delta.Text = $"Lap dist pct for the 6th car in the array is {lapDistPct}.";

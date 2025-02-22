@@ -23,6 +23,7 @@ namespace IracingOverlay
     public partial class MainWindow : Window
     {
 
+        private Reference _referenceWindow;
 
         private IRacingSdk irsdk;
 
@@ -47,6 +48,21 @@ namespace IracingOverlay
 
             // lets go!
             irsdk.Start();
+        }
+
+        private void ReferenceChecked(object sender, RoutedEventArgs e)
+        {
+            _referenceWindow = new Reference();
+            _referenceWindow.Show();
+        }
+
+        private void ReferenceUnchecked(object sender, RoutedEventArgs e)
+        {
+            if (_referenceWindow != null)
+            {
+                _referenceWindow.Close();
+                _referenceWindow = null;
+            }
         }
 
         #region EventHandlers

@@ -52,6 +52,7 @@ namespace IracingOverlay
         #region EventHandlers
 
         //debugging stuff
+
         private void Window_Closing(object sender, CancelEventArgs e)
         {
             irsdk.Stop();
@@ -79,17 +80,51 @@ namespace IracingOverlay
             Debug.WriteLine($"OnSessionInfo fired! Track name is {trackName}.");
         }
 
-        private void OnTelemetryData()
-        {
-            //get delta to 6th car
-            var lapDistPct = irsdk.Data.GetFloat("CarIdxLapDistPct", 5);
+private void OnTelemetryData()
+{
+    int carIdx = 23;
 
-            //Update Delta on Window
+    // Check telemetry data and session info
+    if (irsdk != null && irsdk.Data != null && irsdk.Data.SessionInfo != null && irsdk.Data.SessionInfo.DriverInfo != null)
+    {
+        // Get the lap distance percentage
+        var lapDistPct = irsdk.Data.GetFloat("CarIdxLapDistPct", carIdx);
+
+        // Retrieve the driver information
+        var driverInfo = irsdk.Data.SessionInfo.DriverInfo.Drivers.FirstOrDefault(d => d.CarIdx == carIdx);
+
+        if (driverInfo != null)
+        {
+            // Retrieve Player Info
+            var driverName = driverInfo.TeamName; // Player Name
+            var carName = driverInfo.CarScreenName; // Car Make/Model
+            var carNumber = driverInfo.CarNumber; // Car Number
+
+            // Update Info on Window
             Dispatcher.Invoke(() =>
             {
-                Delta.Text = $"Lap dist pct for the 6th car in the array is {lapDistPct}.";
+                Delta.Text = $"Distance: {lapDistPct}, Name: {carName}, Number: {carNumber}.";
             });
         }
+        else
+        {
+            // driver info not found
+            Dispatcher.Invoke(() =>
+            {
+                Delta.Text = $"Distance: {lapDistPct}. Driver information not found.";
+            });
+        }
+    }
+    else
+    {
+        // telemetry data session info is null
+        Dispatcher.Invoke(() =>
+        {
+            Delta.Text = "Telemetry data or session info is not available.";
+        });
+    }
+}
+
 
         private void OnStopped()
         {

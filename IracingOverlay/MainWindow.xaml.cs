@@ -80,52 +80,58 @@ namespace IracingOverlay
             Debug.WriteLine($"OnSessionInfo fired! Track name is {trackName}.");
         }
 
-private void OnTelemetryData()
-{
-    int carIdx = 13;
-
-    // Check telemetry data and session info
-    if (irsdk != null && irsdk.Data != null && irsdk.Data.SessionInfo != null && irsdk.Data.SessionInfo.DriverInfo != null)
-    {
-        // Get the lap distance percentage
-        var lapDistPct = irsdk.Data.GetFloat("CarIdxLapDistPct", carIdx);
-
-        // Retrieve the driver information
-        var driverInfo = irsdk.Data.SessionInfo.DriverInfo.Drivers.FirstOrDefault(d => d.CarIdx == carIdx);
-
-        if (driverInfo != null)
+        private void OnTelemetryData()
         {
-            // Retrieve Player Info
-            var driverName = driverInfo.TeamName; // Player Name
-            var carName = driverInfo.CarScreenName; // Car Make/Model
-            var carNumber = driverInfo.CarNumber; // Car Number
-            var LicenseLevel = driverInfo.LicLevel; // License Level
-            var iRating = driverInfo.IRating; // iRating
+            int carIdx = 0;
 
-            // Update Info on Window
-            Dispatcher.Invoke(() =>
+            // Check telemetry data and session info
+            if (irsdk != null && irsdk.Data != null && irsdk.Data.SessionInfo != null && irsdk.Data.SessionInfo.DriverInfo != null)
             {
-                Delta.Text = $"Distance: {lapDistPct}, Name: {driverName}, Number: {carNumber}.";
-            });
-        }
-        else
-        {
-            // driver info not found
-            Dispatcher.Invoke(() =>
+
+
+                var totalDrivers = irsdk.Data.SessionInfo.DriverInfo.Drivers.Count;
+
+                carIdx = totalDrivers - 1;
+
+                // Get the lap distance percentage
+                var lapDistPct = irsdk.Data.GetFloat("CarIdxLapDistPct", carIdx);
+
+                // Retrieve the driver information
+                var driverInfo = irsdk.Data.SessionInfo.DriverInfo.Drivers.FirstOrDefault(d => d.CarIdx == carIdx);
+
+                if (driverInfo != null)
+                {
+                    // Retrieve Player Info
+                    var driverName = driverInfo.TeamName; // Player Name
+                    var carName = driverInfo.CarScreenName; // Car Make/Model
+                    var carNumber = driverInfo.CarNumber; // Car Number
+                    var LicenseLevel = driverInfo.LicLevel; // License Level
+                    var iRating = driverInfo.IRating; // iRating
+
+                    // Update Info on Window
+                    Dispatcher.Invoke(() =>
+                    {
+                        Delta.Text = $"Distance: {totalDrivers}, Name: {driverName}, Number: {iRating}.";
+                    });
+                }
+                else
+                {
+                    // driver info not found
+                    Dispatcher.Invoke(() =>
+                    {
+                        Delta.Text = $"Distance: {lapDistPct}. Driver information not found.";
+                    });
+                }
+            }
+            else
             {
-                Delta.Text = $"Distance: {lapDistPct}. Driver information not found.";
-            });
+                // telemetry data session info is null
+                Dispatcher.Invoke(() =>
+                {
+                    Delta.Text = "Telemetry data or session info is not available.";
+                });
+            }
         }
-    }
-    else
-    {
-        // telemetry data session info is null
-        Dispatcher.Invoke(() =>
-        {
-            Delta.Text = "Telemetry data or session info is not available.";
-        });
-    }
-}
 
 
         private void OnStopped()

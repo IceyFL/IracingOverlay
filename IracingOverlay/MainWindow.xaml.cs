@@ -82,7 +82,7 @@ namespace IracingOverlay
 
 private void OnTelemetryData()
 {
-    int carIdx = 22;
+    int carIdx = 13;
 
     // Check telemetry data and session info
     if (irsdk != null && irsdk.Data != null && irsdk.Data.SessionInfo != null && irsdk.Data.SessionInfo.DriverInfo != null)
@@ -105,7 +105,7 @@ private void OnTelemetryData()
             // Update Info on Window
             Dispatcher.Invoke(() =>
             {
-                Delta.Text = $"Distance: {LicenseLevel}, Name: {carName}, Number: {carNumber}.";
+                Delta.Text = $"Distance: {lapDistPct}, Name: {driverName}, Number: {carNumber}.";
             });
         }
         else

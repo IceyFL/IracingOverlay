@@ -1,0 +1,22 @@
+<UserControl x:Class="IracingOverlay.UI.ReferenceUser"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignWidth="490"
+             Background="#33ffffff"
+             Margin="10,0,10,0"
+             Height="35">
+
+    <Grid>
+        <Label x:Name="Name"
+               Foreground="White"
+               Content="John Doe"
+               VerticalContentAlignment="Center"
+               Padding="1,10,1,10"
+               FontSize="13"
+               Margin="10,0,0,0"
+               FontWeight="Bold"/>
+    </Grid>
+</UserControl>

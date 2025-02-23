@@ -22,6 +22,7 @@ namespace IracingOverlay
 {
     public partial class MainWindow : Window
     {
+        public bool IsReferenceChecked { get; set; }
 
         private Reference _referenceWindow;
 

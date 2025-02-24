@@ -34,12 +34,13 @@
                 VerticalAlignment="Center"
                 HorizontalAlignment="Left"
                 Margin="297,0,0,0">
-            <TextBlock Name="SafetyRating"
-                       Text="4.9"
+            <Label Name="SafetyRating"
+                       Content="4.9"
                        Foreground="White"
                        FontSize="16"
                        FontWeight="Bold"
                        VerticalAlignment="Center"
+                       Padding="0,0,0,0"
                        HorizontalAlignment="Center"/>
         </Border>
 
@@ -50,21 +51,22 @@
                 VerticalAlignment="Center"
                 HorizontalAlignment="Left"
                 Margin="343,0,0,0">
-            <TextBlock Name="IratingK"
-                       Text="10.9k"
+            <Label Name="IratingK"
+                       Content="10.9k"
                        Foreground="White"
                        FontSize="16"
                        FontWeight="Bold"
                        VerticalAlignment="Center"
+                       Padding="0,0,0,0"
                        HorizontalAlignment="Center"/>
         </Border>
         <Label x:Name="DeltaS"
                Foreground="White"
                Content="100.9s"
                VerticalContentAlignment="Center"
-               Padding="1,0,1,0"
+               Padding="1,0,0,0"
                FontSize="16"
-               Margin="412,0,17,0"
+               Margin="397,0,20,0"
                FontWeight="Bold"/>
     </Grid>
     </Border>

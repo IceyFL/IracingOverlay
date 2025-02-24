@@ -11,7 +11,9 @@
         MouseLeftButtonDown="Window_MouseLeftButtonDown"
         Background="#aa000000">
         <Grid >
-			<Grid x:Name="mainGrid">
+			<Grid>
+				<StackPanel x:Name="mainGrid" Orientation="Vertical">
+				</StackPanel>
 			</Grid>
         </Grid>
 </Window>

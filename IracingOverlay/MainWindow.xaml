@@ -8,13 +8,6 @@
         Title="MainWindow" Height="450" Width="800">
     <Grid>
         <CheckBox Content="Open Reference" Checked="ReferenceChecked" Unchecked="ReferenceUnchecked" Width="150" Height="50" Margin="0, 30, 550, 350"/>
-        <TextBlock Text="Distance: 99.9s" 
-                   Name="Delta"
-                   FontSize="24" 
-                   Foreground="Black" 
-                   HorizontalAlignment="Center" 
-                   VerticalAlignment="Center" />
-
     </Grid>
 </Window>
 

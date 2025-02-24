@@ -93,8 +93,6 @@ namespace IracingOverlay
         private void OnSessionInfo()
         {
             var trackName = irsdk.Data.SessionInfo.WeekendInfo.TrackName;
-
-            Debug.WriteLine($"OnSessionInfo fired! Track name is {trackName}.");
         }
 
         private void OnTelemetryData()
@@ -112,6 +110,15 @@ namespace IracingOverlay
 
                 // Get the lap distance percentage
                 var lapDistPct = irsdk.Data.GetFloat("CarIdxLapDistPct", carIdx);
+                
+                //estimated lap time
+                var estLapTime = irsdk.Data.GetFloat("CarIdxEstTime", carIdx);
+
+                //use est and percent to get delta
+                double delta = Math.Round(lapDistPct * estLapTime, 1);
+
+                //convert delta to string
+                string deltaString = delta.ToString() + "s";
 
                 // Retrieve the driver information
                 var driverInfo = irsdk.Data.SessionInfo.DriverInfo.Drivers.FirstOrDefault(d => d.CarIdx == carIdx);
@@ -123,30 +130,9 @@ namespace IracingOverlay
                     var carName = driverInfo.CarScreenName; // Car Make/Model
                     var carNumber = driverInfo.CarNumber; // Car Number
                     var LicenseLevel = driverInfo.LicLevel; // License Level
+                    var SafetyRating = driverInfo.LicSubLevel; // Safety Rating
                     var iRating = driverInfo.IRating; // iRating
-
-                    // Update Info on Window
-                    Dispatcher.Invoke(() =>
-                    {
-                        Delta.Text = $"Distance: {totalDrivers}, Name: {driverName}, Number: {iRating}.";
-                    });
                 }
-                else
-                {
-                    // driver info not found
-                    Dispatcher.Invoke(() =>
-                    {
-                        Delta.Text = $"Distance: {lapDistPct}. Driver information not found.";
-                    });
-                }
-            }
-            else
-            {
-                // telemetry data session info is null
-                Dispatcher.Invoke(() =>
-                {
-                    Delta.Text = "Telemetry data or session info is not available.";
-                });
             }
         }
 

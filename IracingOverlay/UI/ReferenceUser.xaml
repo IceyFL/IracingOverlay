@@ -5,18 +5,67 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d"
              d:DesignWidth="490"
-             Background="#33ffffff"
+             Background="#00ffffff"
              Margin="10,0,10,0"
              Height="35">
-
+    <Border Background="#33FFFFFF" BorderBrush="#50FFFFFF" BorderThickness="0" CornerRadius="5" Margin="0,0,0,0">
     <Grid>
+        <Label x:Name="Position"
+               Foreground="White"
+               Content="P1"
+               VerticalContentAlignment="Center"
+               Padding="1,0,1,0"
+               FontSize="16"
+               Margin="7,0,453,0"
+               FontWeight="Bold"/>
         <Label x:Name="Name"
                Foreground="White"
                Content="John Doe"
                VerticalContentAlignment="Center"
-               Padding="1,10,1,10"
-               FontSize="13"
-               Margin="10,0,0,0"
+               Padding="1,0,1,0"
+               FontSize="16"
+               Margin="37,0,198,0"
+               FontWeight="Bold"/>
+        <Border Name="LicenseLevel"
+                Width="35"
+                Height="25"
+                CornerRadius="5"
+                Background="Blue"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Left"
+                Margin="297,0,0,0">
+            <TextBlock Name="SafetyRating"
+                       Text="4.9"
+                       Foreground="White"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"/>
+        </Border>
+
+        <Border Width="50"
+                Height="25"
+                CornerRadius="5"
+                Background="#aaaaaaaa"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Left"
+                Margin="343,0,0,0">
+            <TextBlock Name="IratingK"
+                       Text="10.9k"
+                       Foreground="White"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"/>
+        </Border>
+        <Label x:Name="DeltaS"
+               Foreground="White"
+               Content="100.9s"
+               VerticalContentAlignment="Center"
+               Padding="1,0,1,0"
+               FontSize="16"
+               Margin="412,0,17,0"
                FontWeight="Bold"/>
     </Grid>
+    </Border>
 </UserControl>

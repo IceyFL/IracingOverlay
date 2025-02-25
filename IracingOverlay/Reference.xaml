@@ -9,6 +9,7 @@
         WindowStyle="None"
         AllowsTransparency="True"
         MouseLeftButtonDown="Window_MouseLeftButtonDown"
+        Topmost="True"
         Background="#aa000000">
         <Grid >
 			<Grid>

@@ -17,7 +17,7 @@
                VerticalContentAlignment="Center"
                Padding="1,0,1,0"
                FontSize="16"
-               Margin="7,0,453,0"
+               Margin="7,0,442,0"
                FontWeight="Bold"/>
         <Label x:Name="Name"
                Foreground="White"
@@ -25,7 +25,7 @@
                VerticalContentAlignment="Center"
                Padding="1,0,1,0"
                FontSize="16"
-               Margin="37,0,198,0"
+               Margin="52,0,204,0"
                FontWeight="Bold"/>
         <Border Name="LicenseLevel"
                 Width="35"

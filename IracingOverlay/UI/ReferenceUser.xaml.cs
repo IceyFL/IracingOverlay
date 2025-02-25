@@ -17,7 +17,33 @@ namespace IracingOverlay.UI
             SafetyRating.Content = safetyRating;
             IratingK.Content = iRating;
             DeltaS.Content = delta;
-            LicenseLevel.Background = new SolidColorBrush(Colors.Green);
+
+
+            //switch case to decide the license color
+            switch (licenseLevel.ToLower())
+            {
+                case "a":
+                    LicenseLevel.Background = new SolidColorBrush(Colors.Blue);
+                    break;
+                case "b":
+                    LicenseLevel.Background = new SolidColorBrush(Colors.Green);
+                    break;
+                case "c":
+                    LicenseLevel.Background = new SolidColorBrush(Colors.Yellow);
+                    break;
+                case "d":
+                    LicenseLevel.Background = new SolidColorBrush(Colors.Orange);
+                    break;
+                case "r":
+                    LicenseLevel.Background = new SolidColorBrush(Colors.Red);
+                    break;
+                case "p":
+                    LicenseLevel.Background = new SolidColorBrush(Colors.Black);
+                    break;
+                default:
+                    LicenseLevel.Background = new SolidColorBrush(Colors.Gray); // Default color if license level is not recognized
+                    break;
+            }
 
 
         }

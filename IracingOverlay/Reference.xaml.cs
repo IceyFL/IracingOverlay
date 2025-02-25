@@ -11,20 +11,27 @@ namespace IracingOverlay
         public Reference()
         {
             InitializeComponent();
-            //temp variables
-            string position = "P1";
-            string drivername = "John Doe";
-            string safetyrating = "4.99";
-            string licenselevel = "A";
-            string irating = "10.9k";
-            string delta = "+100.9s";
-
-            //create a new ReferenceUser object
-            var Driver1 = new ReferenceUser(position, drivername, safetyrating, licenselevel, irating, delta);
-
-            //add reference user object to the UI
-            mainGrid.Children.Add(Driver1);
         }
+
+        public void AddDriver(string position, string drivername, string safetyrating, string licenselevel, string irating, string delta) {
+
+            //create a reference user object
+            var Driver = new ReferenceUser(position, drivername, safetyrating, licenselevel, irating, delta);
+
+            //add it to the UI
+            mainGrid.Children.Add(Driver);
+        }
+
+        public void Placeholder() {
+            
+            //create a placeholder object
+            var empty = new Placeholder();
+
+            //add to the UI
+            mainGrid.Children.Add(empty);
+
+        }
+
         private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ButtonState == MouseButtonState.Pressed)

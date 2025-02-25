@@ -32,6 +32,12 @@ namespace IracingOverlay
 
         }
 
+        public void ClearGrid()
+        {
+            // Clear all children from the mainGrid
+            mainGrid.Children.Clear();
+        }
+
         private void Window_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ButtonState == MouseButtonState.Pressed)

@@ -82,7 +82,7 @@ namespace IracingOverlay
 
         private void OnException(Exception exception)
         {
-            Debug.WriteLine("OnException() fired!");
+            Debug.WriteLine("OnException() fired!" + exception.Message);
         }
 
         private void OnConnected()
@@ -112,6 +112,11 @@ namespace IracingOverlay
                 // Check telemetry data and session info
                 if (irsdk != null && irsdk.Data != null && irsdk.Data.SessionInfo != null && irsdk.Data.SessionInfo.DriverInfo != null)
                 {
+
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        _referenceWindow.ClearGrid();
+                    });
 
                     //total number of drivers in the session
                     var totalDrivers = irsdk.Data.SessionInfo.DriverInfo.Drivers.Count;
@@ -169,7 +174,15 @@ namespace IracingOverlay
                         var carNumber = driverInfo.CarNumber; // Car Number
                         var LicenseLevel = driverInfo.LicLevel; // License Level
                         var SafetyRating = driverInfo.LicSubLevel; // Safety Rating
-                        var iRating = driverInfo.IRating; // iRating
+                        double iRating = driverInfo.IRating / 1000; // iRating
+                        iRating = Math.Round((double)iRating, 1);
+                        string iRatingString = iRating.ToString() + "k";
+
+                        Application.Current.Dispatcher.Invoke(() =>
+                        {
+                            _referenceWindow.AddDriver("1", driverName, SafetyRating.ToString(), "a", iRatingString, estLapTime.ToString());
+                        });
+
                     }
                 }
                 #endregion

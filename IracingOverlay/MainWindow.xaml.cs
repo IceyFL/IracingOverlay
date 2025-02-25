@@ -126,6 +126,9 @@ namespace IracingOverlay
                     //DriverLapTime for delta
                     var DriverLapTime = irsdk.Data.GetFloat("CarIdxEstTime", DriverIdx);
 
+                    //driver lap distance
+                    var DriverLapDist = irsdk.Data.GetFloat("CarIdxLapDistPct", DriverIdx);
+
                     //list of all drivers ordered by distance
                     var driversOrdered = new List<(int CarIdx, float LapDistPct)>();
 
@@ -142,6 +145,13 @@ namespace IracingOverlay
                         //check they are on track
                         if (lapDistPct != -1)
                         {
+                            lapDistPct = lapDistPct - DriverLapDist;
+
+                            if (lapDistPct < 0)
+                            {
+                                lapDistPct = lapDistPct + 1;
+                            }
+
                             // Add to the list
                             driversOrdered.Add((carIdx, lapDistPct));
                         }

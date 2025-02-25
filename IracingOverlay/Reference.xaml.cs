@@ -21,6 +21,7 @@ namespace IracingOverlay
 
             //create a new ReferenceUser object
             var Driver1 = new ReferenceUser(position, drivername, safetyrating, licenselevel, irating, delta);
+
             //add reference user object to the UI
             mainGrid.Children.Add(Driver1);
         }

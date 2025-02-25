@@ -14,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using IracingOverlay.UI;
 
 /// Import the IRSDKSharper library
 using IRSDKSharper;
@@ -22,6 +23,8 @@ namespace IracingOverlay
 {
     public partial class MainWindow : Window
     {
+        bool ReferenceWindowOpen = false;
+
         public bool IsReferenceChecked { get; set; }
 
         private Reference _referenceWindow;
@@ -55,6 +58,7 @@ namespace IracingOverlay
         {
             _referenceWindow = new Reference();
             _referenceWindow.Show();
+            ReferenceWindowOpen = true;
         }
 
         private void ReferenceUnchecked(object sender, RoutedEventArgs e)
@@ -63,6 +67,7 @@ namespace IracingOverlay
             {
                 _referenceWindow.Close();
                 _referenceWindow = null;
+                ReferenceWindowOpen = false;
             }
         }
 
@@ -97,42 +102,77 @@ namespace IracingOverlay
 
         private void OnTelemetryData()
         {
+
+            #region Relative
+            if (ReferenceWindowOpen) {
+
             int carIdx = 0;
+            double delta = 0.0;
 
-            // Check telemetry data and session info
-            if (irsdk != null && irsdk.Data != null && irsdk.Data.SessionInfo != null && irsdk.Data.SessionInfo.DriverInfo != null)
-            {
-
-
-                var totalDrivers = irsdk.Data.SessionInfo.DriverInfo.Drivers.Count;
-
-                carIdx = totalDrivers - 1;
-
-                // Get the lap distance percentage
-                var lapDistPct = irsdk.Data.GetFloat("CarIdxLapDistPct", carIdx);
-                
-                //estimated lap time
-                var estLapTime = irsdk.Data.GetFloat("CarIdxEstTime", carIdx);
-
-                //use est and percent to get delta
-                double delta = Math.Round(lapDistPct * estLapTime, 1);
-
-                //convert delta to string
-                string deltaString = delta.ToString() + "s";
-
-                // Retrieve the driver information
-                var driverInfo = irsdk.Data.SessionInfo.DriverInfo.Drivers.FirstOrDefault(d => d.CarIdx == carIdx);
-
-                if (driverInfo != null)
+                // Check telemetry data and session info
+                if (irsdk != null && irsdk.Data != null && irsdk.Data.SessionInfo != null && irsdk.Data.SessionInfo.DriverInfo != null)
                 {
-                    // Retrieve Player Info
-                    var driverName = driverInfo.TeamName; // Player Name
-                    var carName = driverInfo.CarScreenName; // Car Make/Model
-                    var carNumber = driverInfo.CarNumber; // Car Number
-                    var LicenseLevel = driverInfo.LicLevel; // License Level
-                    var SafetyRating = driverInfo.LicSubLevel; // Safety Rating
-                    var iRating = driverInfo.IRating; // iRating
+
+                    //total number of drivers in the session
+                    var totalDrivers = irsdk.Data.SessionInfo.DriverInfo.Drivers.Count;
+
+                    //Driver caridx
+                    int DriverIdx = irsdk.Data.SessionInfo.DriverInfo.DriverCarIdx;
+
+
+
+                    //list of all drivers ordered by distance
+                    var driversOrdered = new List<(int CarIdx, float LapDistPct)>();
+
+                    carIdx = totalDrivers - 1;
+
+                    //initiate lapdistpct variable
+                    float lapDistPct = 0;
+
+                    // Loop through all drivers
+                    for (int i = 0; i < totalDrivers - 1; i++)
+                    {
+                        carIdx = i;
+                        lapDistPct = irsdk.Data.GetFloat("CarIdxLapDistPct", carIdx);
+
+                        // Add to the list
+                        driversOrdered.Add((carIdx, lapDistPct));
+                    }
+
+                    // Find the index of the players car
+                    int playerIndex = driversOrdered.FindIndex(d => d.CarIdx == DriverIdx);
+
+                    // Sort the list by lap distance percentage in descending order
+                    driversOrdered = driversOrdered.OrderByDescending(d => d.LapDistPct).ToList();
+
+
+
+                    //estimated lap time
+                    var estLapTime = irsdk.Data.GetFloat("CarIdxEstTime", carIdx);
+
+                    //use est and percent to get delta
+                    delta = Math.Round(lapDistPct * estLapTime, 1);
+
+                    //convert delta to string
+                    string deltaString = delta.ToString() + "s";
+
+                    carIdx = DriverIdx;
+
+                    // Retrieve the driver information
+                    var driverInfo = irsdk.Data.SessionInfo.DriverInfo.Drivers.FirstOrDefault(d => d.CarIdx == carIdx);
+
+                    if (driverInfo != null)
+                    {
+                        // Retrieve Player Info
+                        var driverName = driverInfo.TeamName; // Player Name
+                        var carName = driverInfo.CarScreenName; // Car Make/Model
+                        var carNumber = driverInfo.CarNumber; // Car Number
+                        var LicenseLevel = driverInfo.LicLevel; // License Level
+                        var SafetyRating = driverInfo.LicSubLevel; // Safety Rating
+                        var iRating = driverInfo.IRating; // iRating
+                    }
                 }
+                #endregion
             }
         }
 

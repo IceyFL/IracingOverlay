@@ -19,36 +19,16 @@ namespace IracingOverlay.UI
             IratingK.Content = iRating;
             DeltaS.Content = delta;
 
+            // totally optimal way to get the color to work probably
 
-            // totally optimal way to decide the license color
-            if (licenseLevel.ToLower().Contains("a"))
-            {
-                LicenseLevel.Background = new SolidColorBrush(Colors.Blue);
-            }
-            else if (licenseLevel.ToLower().Contains("b"))
-            {
-                LicenseLevel.Background = new SolidColorBrush(Colors.Green);
-            }
-            else if (licenseLevel.ToLower().Contains("c"))
-            {
-                LicenseLevel.Background = new SolidColorBrush(Colors.Yellow);
-            }
-            else if (licenseLevel.ToLower().Contains("d"))
-            {
-                LicenseLevel.Background = new SolidColorBrush(Colors.Orange);
-            }
-            else if (licenseLevel.ToLower().Contains("r"))
-            {
-                LicenseLevel.Background = new SolidColorBrush(Colors.Red);
-            }
-            else if (licenseLevel.ToLower().Contains("p"))
-            {
-                LicenseLevel.Background = new SolidColorBrush(Colors.Black);
-            }
-            else
-            {
-                LicenseLevel.Background = new SolidColorBrush(Colors.Gray); // Default color if license level is not recognized
-            }
+            // Remove "0x"
+            string hexColor = licenseLevel.Replace("0x", "");
+
+            // Convert hex to a Color
+            Color licenseLevelColor = (Color)ColorConverter.ConvertFromString("#" + hexColor);
+
+            // Set the background color
+            LicenseLevel.Background = new SolidColorBrush(licenseLevelColor);
 
 
         }

@@ -170,8 +170,6 @@ namespace IracingOverlay
                     // Find the index of the players car
                     int playerIndex = driversOrdered.FindIndex(d => d.CarIdx == DriverIdx);
 
-                    var lapdistdriver = irsdk.Data.GetFloat("CarIdxLapDistPct", DriverIdx);
-
                     //how many placeholders should be added
                     int range = 3 - playerIndex;
 
@@ -219,6 +217,25 @@ namespace IracingOverlay
 
                             double delta = estLapTime - DriverLapTime;
 
+                            //get average lap pct per second
+                            var avgLapPctPerSec = lapDistPct / estLapTime;
+                            //average lap time
+                            var avglaptime = 1 / avgLapPctPerSec;
+
+                            //fix delta if they are on different laps
+
+                            //if delta is negative and driver is on a later lap
+                            if (i < 3 && delta < 0)
+                            {
+                                delta = avglaptime - DriverLapTime + estLapTime;
+                            }
+
+                            //if delta is positive and driver is on an earlier lap
+                            if (i > 3 && delta > 0)
+                            {
+                                delta = estLapTime - avglaptime + DriverLapTime;
+                            }
+
                             //use est and percent to get delta
                             delta = Math.Round(delta, 1);
 
@@ -231,7 +248,7 @@ namespace IracingOverlay
                                 var driverName = driverInfo.TeamName; // Player Name
                                 var carName = driverInfo.CarScreenName; // Car Make/Model
                                 var carNumber = driverInfo.CarNumber; // Car Number
-                                var LicenseLevel = driverInfo.LicString; // License Level
+                                var LicenseLevel = driverInfo.LicColor;// License Level
 
                                 var SafetyRating = driverInfo.LicSubLevel; // Safety Rating
                                 double SafetyRatingString = Math.Round(((double)SafetyRating / 100), 1);

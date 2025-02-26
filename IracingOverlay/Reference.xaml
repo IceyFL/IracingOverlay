@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:IracingOverlay"
         mc:Ignorable="d"
-        Title="Reference" Height="300" Width="500"
+        Title="Reference" Height="250" Width="500"
         WindowStyle="None"
         AllowsTransparency="True"
         MouseLeftButtonDown="Window_MouseLeftButtonDown"

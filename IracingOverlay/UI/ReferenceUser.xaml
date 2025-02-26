@@ -8,7 +8,7 @@
              Background="#00ffffff"
              Margin="10,0,10,0"
              Padding="0,5,0,0"
-             Height="37">
+             Height="31">
     <Border Background="#33FFFFFF" BorderBrush="#50FFFFFF" BorderThickness="0" CornerRadius="5" Margin="0,0,0,0">
     <Grid>
         <Label x:Name="Position"
@@ -16,7 +16,7 @@
                Content="P1"
                VerticalContentAlignment="Center"
                Padding="1,0,1,0"
-               FontSize="16"
+               FontSize="14"
                Margin="7,0,432,0"
                FontWeight="Bold"/>
         <Label x:Name="Name"
@@ -24,12 +24,12 @@
                Content="John Doe"
                VerticalContentAlignment="Center"
                Padding="1,0,1,0"
-               FontSize="16"
+               FontSize="14"
                Margin="63,0,204,0"
                FontWeight="Bold"/>
         <Border Name="LicenseLevel"
                 Width="35"
-                Height="25"
+                Height="20"
                 CornerRadius="5"
                 Background="Blue"
                 VerticalAlignment="Center"
@@ -38,7 +38,7 @@
             <Label Name="SafetyRating"
                        Content="4.9"
                        Foreground="White"
-                       FontSize="16"
+                       FontSize="14"
                        FontWeight="Bold"
                        VerticalAlignment="Center"
                        Padding="0,0,0,0"
@@ -46,7 +46,7 @@
         </Border>
 
         <Border Width="50"
-                Height="25"
+                Height="20"
                 CornerRadius="5"
                 Background="#aaaaaaaa"
                 VerticalAlignment="Center"
@@ -55,7 +55,7 @@
             <Label Name="IratingK"
                        Content="10.9k"
                        Foreground="White"
-                       FontSize="16"
+                       FontSize="14"
                        FontWeight="Bold"
                        VerticalAlignment="Center"
                        Padding="0,0,0,0"
@@ -66,7 +66,7 @@
                Content="100.9s"
                VerticalContentAlignment="Center"
                Padding="1,0,0,0"
-               FontSize="16"
+               FontSize="14"
                Margin="397,0,20,0"
                FontWeight="Bold"/>
     </Grid>

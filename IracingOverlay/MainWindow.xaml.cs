@@ -231,7 +231,7 @@ namespace IracingOverlay
                                 var driverName = driverInfo.TeamName; // Player Name
                                 var carName = driverInfo.CarScreenName; // Car Make/Model
                                 var carNumber = driverInfo.CarNumber; // Car Number
-                                var LicenseLevel = driverInfo.LicLevel; // License Level
+                                var LicenseLevel = driverInfo.LicString; // License Level
 
                                 var SafetyRating = driverInfo.LicSubLevel; // Safety Rating
                                 double SafetyRatingString = Math.Round(((double)SafetyRating / 100), 1);
@@ -246,7 +246,7 @@ namespace IracingOverlay
                                 {
 
                                     //add driver to UI
-                                    _referenceWindow.AddDriver("P" + carPosition.ToString(), driverName, SafetyRatingString.ToString(), "a", iRatingString, delta.ToString());
+                                    _referenceWindow.AddDriver("P" + carPosition.ToString(), driverName, SafetyRatingString.ToString(), LicenseLevel, iRatingString, delta.ToString());
                                 });
 
                             }

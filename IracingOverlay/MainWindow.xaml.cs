@@ -123,9 +123,6 @@ namespace IracingOverlay
                     //Driver caridx
                     int DriverIdx = irsdk.Data.SessionInfo.DriverInfo.DriverCarIdx;
 
-                    //DriverLapTime for delta
-                    var DriverLapTime = irsdk.Data.GetFloat("CarIdxEstTime", DriverIdx);
-
                     //driver lap distance
                     var DriverLapDist = irsdk.Data.GetFloat("CarIdxLapDistPct", DriverIdx);
 
@@ -190,6 +187,30 @@ namespace IracingOverlay
                         });
                     }
 
+                    //average lap time
+                    float avglaptime = 0;
+                    var count = 0;
+
+                    for (int i = 0; i < 8; i++)
+                    {
+                        //check exists
+                        int carIndex = i + playerIndex - 3;
+                        if (carIndex >= 0 && carIndex < driversOrdered.Count)
+                        {
+                            count = count + 1;
+                            (var temp1, var temp2) = driversOrdered[carIndex];
+                            avglaptime = avglaptime + (irsdk.Data.GetFloat("CarIdxEstTime", temp1) / irsdk.Data.GetFloat("CarIdxLapDistPct", temp1));
+                        }
+                    }
+
+
+                    avglaptime = avglaptime / count;
+
+
+                    //DriverLapTime for delta
+                    var DriverLapTime = DriverLapDist * avglaptime;
+
+
                     //loop through the 8 closest drivers
                     for (int i = 0; i < 8; i++)
                     {
@@ -209,7 +230,7 @@ namespace IracingOverlay
                             lapDistPct = irsdk.Data.GetFloat("CarIdxLapDistPct", carIdx);
 
                             //estimated lap time
-                            var estLapTime = irsdk.Data.GetFloat("CarIdxEstTime", carIdx);
+                            var estLapTime = lapDistPct * avglaptime;
 
                             var carPosition = irsdk.Data.GetInt("CarIdxPosition", carIdx);
 
@@ -217,15 +238,11 @@ namespace IracingOverlay
 
                             double delta = estLapTime - DriverLapTime;
 
-                            //get average lap pct per second
-                            var avgLapPctPerSec = lapDistPct / estLapTime;
-                            //average lap time
-                            var avglaptime = 1 / avgLapPctPerSec;
-
-                            //fix delta if they are on different laps
 
                             //lap offset for lap calculations later
                             var lapOffset = 0;
+
+                            //fix delta if they are on different laps
 
                             //if delta is negative and driver is on a later lap
                             if (i < 3 && delta < 0)

@@ -224,15 +224,20 @@ namespace IracingOverlay
 
                             //fix delta if they are on different laps
 
+                            //lap offset for lap calculations later
+                            var lapOffset = 0;
+
                             //if delta is negative and driver is on a later lap
                             if (i < 3 && delta < 0)
                             {
+                                lapOffset = -1;
                                 delta = avglaptime - DriverLapTime + estLapTime;
                             }
 
                             //if delta is positive and driver is on an earlier lap
                             if (i > 3 && delta > 0)
                             {
+                                lapOffset = 1;
                                 delta = estLapTime - avglaptime + DriverLapTime;
                             }
 
@@ -260,9 +265,30 @@ namespace IracingOverlay
                                 var TextColor = Colors.White;
 
 
+                                //Driver and Car Lap
+                                var driverlap = irsdk.Data.GetInt("CarIdxLap", DriverIdx);
+                                var currentlap = irsdk.Data.GetInt("CarIdxLap", carIdx);
+
+                                //adjust for lap offset
+                                currentlap += lapOffset;
+
+
+                                //check if its the driver
                                 if (carIdx == DriverIdx)
                                 {
                                     TextColor = Colors.Gold;
+                                }
+
+                                //red if car is lapping driver
+                                else if (currentlap > driverlap)
+                                {
+                                    TextColor = Colors.Red;
+                                }
+
+                                //light blue if driver is lapping car
+                                else if (currentlap < driverlap)
+                                {
+                                    TextColor = Colors.LightBlue;
                                 }
 
 

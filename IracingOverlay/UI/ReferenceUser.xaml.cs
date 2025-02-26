@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -10,7 +11,7 @@ namespace IracingOverlay.UI
     /// </summary>
     public partial class ReferenceUser : UserControl
     {
-        public ReferenceUser(string position, string name, string safetyRating, string licenseLevel, string iRating, string delta)
+        public ReferenceUser(string position, string name, string safetyRating, string licenseLevel, string iRating, string delta, SolidColorBrush TextColor)
         {
             InitializeComponent();
             Position.Content = position;
@@ -18,6 +19,12 @@ namespace IracingOverlay.UI
             SafetyRating.Content = safetyRating;
             IratingK.Content = iRating;
             DeltaS.Content = delta;
+
+
+            //Change text color
+            Position.Foreground = TextColor;
+            Name.Foreground = TextColor;
+            DeltaS.Foreground = TextColor;
 
             // totally optimal way to get the color to work probably
 

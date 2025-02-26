@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media;
 using IracingOverlay.UI;
 
 namespace IracingOverlay
@@ -17,10 +18,10 @@ namespace IracingOverlay
             InitializeComponent();
         }
 
-        public void AddDriver(string position, string drivername, string safetyrating, string licenselevel, string irating, string delta) {
+        public void AddDriver(string position, string drivername, string safetyrating, string licenselevel, string irating, string delta, SolidColorBrush TextColor) {
 
             //create a reference user object
-            var Driver = new ReferenceUser(position, drivername, safetyrating, licenselevel, irating, delta);
+            var Driver = new ReferenceUser(position, drivername, safetyrating, licenselevel, irating, delta, TextColor);
 
             //add it to the UI
             elements.Add(Driver);

@@ -257,13 +257,21 @@ namespace IracingOverlay
                                 decimal iRating = Math.Round((decimal)driverInfo.IRating / 1000, 1); // iRating
                                 string iRatingString = iRating.ToString() + "k";
 
+                                var TextColor = Colors.White;
+
+
+                                if (carIdx == DriverIdx)
+                                {
+                                    TextColor = Colors.Gold;
+                                }
+
 
 
                                 Application.Current.Dispatcher.Invoke(() =>
                                 {
 
                                     //add driver to UI
-                                    _referenceWindow.AddDriver("P" + carPosition.ToString(), driverName, SafetyRatingString.ToString(), LicenseLevel, iRatingString, delta.ToString());
+                                    _referenceWindow.AddDriver("P" + carPosition.ToString(), driverName, SafetyRatingString.ToString(), LicenseLevel, iRatingString, delta.ToString(), new SolidColorBrush(TextColor));
                                 });
 
                             }

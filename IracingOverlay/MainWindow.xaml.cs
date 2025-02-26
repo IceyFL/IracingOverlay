@@ -136,20 +136,27 @@ namespace IracingOverlay
                     //initiate lapdistpct variable
                     float lapDistPct = 0;
 
+
                     // Loop through all drivers
                     for (int i = 0; i < totalDrivers - 1; i++)
                     {
                         carIdx = i;
                         lapDistPct = irsdk.Data.GetFloat("CarIdxLapDistPct", carIdx);
 
+                        var tempOffset = 0.5 - DriverLapDist;
+
                         //check they are on track
                         if (lapDistPct != -1)
                         {
-                            lapDistPct = lapDistPct - DriverLapDist;
+                            lapDistPct = lapDistPct + (float)tempOffset;
 
                             if (lapDistPct < 0)
                             {
                                 lapDistPct = lapDistPct + 1;
+                            }
+                            if (lapDistPct > 1)
+                            {
+                                lapDistPct = lapDistPct - 1;
                             }
 
                             // Add to the list
@@ -205,6 +212,11 @@ namespace IracingOverlay
 
                             //estimated lap time
                             var estLapTime = irsdk.Data.GetFloat("CarIdxEstTime", carIdx);
+
+                            var carPosition = irsdk.Data.GetInt("CarIdxPosition", carIdx);
+
+
+
                             double delta = estLapTime - DriverLapTime;
 
                             //use est and percent to get delta
@@ -234,7 +246,7 @@ namespace IracingOverlay
                                 {
 
                                     //add driver to UI
-                                    _referenceWindow.AddDriver("P" + (carIndex + 1).ToString(), driverName, SafetyRatingString.ToString(), "a", iRatingString, delta.ToString());
+                                    _referenceWindow.AddDriver("P" + carPosition.ToString(), driverName, SafetyRatingString.ToString(), "a", iRatingString, delta.ToString());
                                 });
 
                             }

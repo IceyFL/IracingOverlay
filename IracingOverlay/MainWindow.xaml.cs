@@ -247,7 +247,7 @@ namespace IracingOverlay
                                 {
 
                                     //add driver to UI
-                                    _referenceWindow.AddDriver("P" + carPosition.ToString(), driverName.ToString(), SafetyRating.ToString(), LicenseLevel, iRating.ToString(), delta.ToString(), new SolidColorBrush(TextColor), BackgroundColor);
+                                    _referenceWindow.AddDriver("P" + carPosition.ToString(), driverName.ToString(), SafetyRating.ToString(), LicenseLevel, iRating.ToString(), delta.ToString() + "k", new SolidColorBrush(TextColor), BackgroundColor);
                                 });
 
                             }

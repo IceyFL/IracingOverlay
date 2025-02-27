@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -102,16 +103,33 @@ namespace IracingOverlay
 
         private void OnTelemetryData()
         {
+            RunRelative();
+        }
 
-            #region Relative
-            if (ReferenceWindowOpen) {
 
-            int carIdx = 0;
+        private void OnStopped()
+        {
+            Debug.WriteLine("OnStopped() fired!");
+        }
+
+        private void OnDebugLog(string message)
+        {
+            Debug.WriteLine(message);
+        }
+
+        #region Relative
+
+        private void RunRelative()
+        {
+            if (ReferenceWindowOpen)
+            {
+                //initialize caridx
+                int carIdx = 0;
 
                 // Check telemetry data and session info
                 if (irsdk != null && irsdk.Data != null && irsdk.Data.SessionInfo != null && irsdk.Data.SessionInfo.DriverInfo != null)
                 {
-
+                    //Clear Grid using different thread
                     Application.Current.Dispatcher.Invoke(() =>
                     {
                         _referenceWindow.ClearGrid();
@@ -127,98 +145,19 @@ namespace IracingOverlay
                     var DriverLapDist = irsdk.Data.GetFloat("CarIdxLapDistPct", DriverIdx);
 
                     //list of all drivers ordered by distance
-                    var driversOrdered = new List<(int CarIdx, float LapDistPct)>();
-
-
-                    //initiate lapdistpct variable
-                    float lapDistPct = 0;
-
-
-                    // Loop through all drivers
-                    for (int i = 0; i < totalDrivers - 1; i++)
-                    {
-                        carIdx = i;
-                        lapDistPct = irsdk.Data.GetFloat("CarIdxLapDistPct", carIdx);
-
-                        var tempOffset = 0.5 - DriverLapDist;
-
-                        //check they are on track
-                        if (lapDistPct != -1)
-                        {
-                            lapDistPct = lapDistPct + (float)tempOffset;
-
-                            if (lapDistPct < 0)
-                            {
-                                lapDistPct = lapDistPct + 1;
-                            }
-                            if (lapDistPct > 1)
-                            {
-                                lapDistPct = lapDistPct - 1;
-                            }
-
-                            // Add to the list
-                            driversOrdered.Add((carIdx, lapDistPct));
-                        }
-                    }
-
-                    // Sort the list by lap distance percentage in descending order
-                    driversOrdered = driversOrdered.OrderByDescending(d => d.LapDistPct).ToList();
+                    List<(int CarIdx, float LapDistPct)> driversOrdered = SortDriverList(totalDrivers, DriverLapDist);
 
                     // Find the index of the players car
                     int playerIndex = driversOrdered.FindIndex(d => d.CarIdx == DriverIdx);
 
-                    //how many placeholders should be added
-                    int range = 3 - playerIndex;
+                    AddPlaceholders(DriverIdx, driversOrdered, playerIndex);
+                    
 
-                    //if range less than 0 make it 0
-                    if (range < 0) { range = 0; }
-
-                    //Decides if placeholders are needed
-                    if (range > 0)
-                    {
-                        Application.Current.Dispatcher.Invoke(() =>
-                        {
-                            //loops for amount necessary
-                            for (int x = 0; x < range; x++)
-                            {
-                                // Add placeholders for empty spaces
-                                _referenceWindow.Placeholder();
-                            }
-                        });
-                    }
-
+                    //create driverInfo variable
                     var driverInfo = irsdk.Data.SessionInfo.DriverInfo.Drivers.FirstOrDefault(d => d.CarIdx == DriverIdx);
 
-                    //average lap time
-                    float avglaptime = 0;
-                    var count = 0;
-
-                    for (int i = 0; i < driversOrdered.Count; i++)
-                    {
-                        count = count + 1;
-                        (var temp1, var temp2) = driversOrdered[i];
-                        var lastlap = irsdk.Data.GetFloat("CarIdxLastLapTime", temp1);
-
-                        //check if in the pits
-                        var inPits = irsdk.Data.GetBool("CarIdxOnPitRoad", carIdx);
-
-                        if (inPits == false)
-                        {
-                            //checks if there is a last lap
-                            if (lastlap != -1)
-                            {
-                                avglaptime = avglaptime + lastlap;
-                            }
-                            else
-                            {
-                                avglaptime = avglaptime + driverInfo.CarClassEstLapTime;
-                            }
-                        }
-                    }
-
-
-                    avglaptime = avglaptime / count;
-                    avglaptime = (int)avglaptime;
+                    //get average lap time for delta calculations
+                    int avglaptime = GetAvgLap(driverInfo, driversOrdered);
 
 
                     //DriverLapTime for delta
@@ -228,7 +167,6 @@ namespace IracingOverlay
                     //loop through the 8 closest drivers
                     for (int i = 0; i < 8; i++)
                     {
-
                         //work out current car
                         int carIndex = i + playerIndex - 3;
 
@@ -240,40 +178,7 @@ namespace IracingOverlay
 
                             carIdx = DriverIndex;
 
-                            //lap dist pct of current car
-                            lapDistPct = irsdk.Data.GetFloat("CarIdxLapDistPct", carIdx);
-
-                            //estimated lap time
-                            var estLapTime = lapDistPct * avglaptime;
-
-                            var carPosition = irsdk.Data.GetInt("CarIdxPosition", carIdx);
-
-
-
-                            double delta = estLapTime - DriverLapTime;
-
-
-                            //lap offset for lap calculations later
-                            var lapOffset = 0;
-
-                            //fix delta if they are on different laps
-
-                            //if delta is negative and driver is on a later lap
-                            if (i < 3 && delta < 0)
-                            {
-                                lapOffset = -1;
-                                delta = avglaptime - DriverLapTime + estLapTime;
-                            }
-
-                            //if delta is positive and driver is on an earlier lap
-                            if (i > 3 && delta > 0)
-                            {
-                                lapOffset = 1;
-                                delta = estLapTime - (avglaptime + DriverLapTime);
-                            }
-
-                            //use est and percent to get delta
-                            delta = Math.Round(delta, 1);
+                            (var delta, var lapoffset) = GetDelta(carIdx, avglaptime, DriverLapTime, i);
 
                             // Retrieve the driver information
                             driverInfo = irsdk.Data.SessionInfo.DriverInfo.Drivers.FirstOrDefault(d => d.CarIdx == carIdx);
@@ -286,77 +191,225 @@ namespace IracingOverlay
                                 var carNumber = driverInfo.CarNumber; // Car Number
                                 var LicenseLevel = driverInfo.LicColor;// License Level
 
-                                var SafetyRating = driverInfo.LicSubLevel; // Safety Rating
-                                double SafetyRatingString = Math.Round(((double)SafetyRating / 100), 1);
-
+                                //convert Safety Rating from 375 to 3.75
+                                double SafetyRating = Math.Round(((double)driverInfo.LicSubLevel / 100), 1);
                                 //convert irating from 1234 to "1.2k"
                                 decimal iRating = Math.Round((decimal)driverInfo.IRating / 1000, 1); // iRating
-                                string iRatingString = iRating.ToString() + "k";
 
-                                var TextColor = Colors.White;
-
-
-                                //Driver and Car Lap
-                                var driverlap = irsdk.Data.GetInt("CarIdxLap", DriverIdx);
-                                var currentlap = irsdk.Data.GetInt("CarIdxLap", carIdx);
+                                //position
+                                var carPosition = irsdk.Data.GetInt("CarIdxPosition", carIdx);
 
 
-                                //adjust for lap offset
-                                currentlap += lapOffset;
+                                //get text color using function
+                                Color TextColor = DecideTextColor(carIdx, DriverIdx, lapoffset);
 
-                                //is car in pits
-                                var inPits = irsdk.Data.GetBool("CarIdxOnPitRoad", carIdx);
-
-
-                                //check if its the driver
-                                if (carIdx == DriverIdx)
-                                {
-                                    TextColor = Colors.Gold;
-                                }
-
-                                else if (inPits)
-                                {
-                                    TextColor = Colors.DarkGray;
-                                }
-
-                                //red if car is lapping driver
-                                else if (currentlap > driverlap)
-                                {
-                                    TextColor = Colors.Red;
-                                }
-
-                                //light blue if driver is lapping car
-                                else if (currentlap < driverlap)
-                                {
-                                    TextColor = Colors.SkyBlue;
-                                }
-
-
+                                //Dispatch to seperate thread
                                 Application.Current.Dispatcher.Invoke(() =>
                                 {
 
                                     //add driver to UI
-                                    _referenceWindow.AddDriver("P" + carPosition.ToString(), driverName, SafetyRatingString.ToString(), LicenseLevel, iRatingString, delta.ToString(), new SolidColorBrush(TextColor));
+                                    _referenceWindow.AddDriver("P" + carPosition.ToString(), driverName, SafetyRating.ToString(), LicenseLevel, iRating.ToString(), delta.ToString(), new SolidColorBrush(TextColor));
                                 });
 
                             }
                         }
                     }
                 }
-                #endregion
             }
         }
 
-
-        private void OnStopped()
+        private Color DecideTextColor(int carIdx, int DriverIdx, int lapOffset)
         {
-            Debug.WriteLine("OnStopped() fired!");
+
+            //get variables
+            //Driver and Car Lap
+            var driverlap = irsdk.Data.GetInt("CarIdxLap", DriverIdx);
+            var currentlap = irsdk.Data.GetInt("CarIdxLap", carIdx);
+            //adjust for lap offset
+            currentlap += lapOffset;
+            //is car in pits
+            var inPits = irsdk.Data.GetBool("CarIdxOnPitRoad", carIdx);
+
+
+            //iniate default color
+            var TextColor = Colors.White;
+
+            //check if its the driver
+            if (carIdx == DriverIdx)
+            {
+                TextColor = Colors.Gold;
+            }
+
+            //check if in pits
+            else if (inPits)
+            {
+                TextColor = Colors.DarkGray;
+            }
+
+            //red if car is lapping driver
+            else if (currentlap > driverlap)
+            {
+                TextColor = Colors.Red;
+            }
+
+            //light blue if driver is lapping car
+            else if (currentlap < driverlap)
+            {
+                TextColor = Colors.SkyBlue;
+            }
+
+            return TextColor;
         }
 
-        private void OnDebugLog(string message)
+        private List<(int CarIdx, float LapDistPct)> SortDriverList(int totalDrivers, float DriverLapDist)
         {
-            Debug.WriteLine(message);
+            //initiate variables
+            float lapDistPct = 0;
+            int carIdx = 0;
+            var driversOrdered = new List<(int CarIdx, float LapDistPct)>();
+
+            // Loop through all drivers
+            for (int i = 0; i < totalDrivers - 1; i++)
+            {
+                carIdx = i;
+                lapDistPct = irsdk.Data.GetFloat("CarIdxLapDistPct", carIdx);
+
+                var tempOffset = 0.5 - DriverLapDist;
+
+                //check they are on track
+                if (lapDistPct != -1)
+                {
+                    lapDistPct = lapDistPct + (float)tempOffset;
+
+                    if (lapDistPct < 0)
+                    {
+                        lapDistPct = lapDistPct + 1;
+                    }
+                    if (lapDistPct > 1)
+                    {
+                        lapDistPct = lapDistPct - 1;
+                    }
+
+                    // Add to the list
+                    driversOrdered.Add((carIdx, lapDistPct));
+                }
+            }
+
+            // Sort the list by lap distance percentage in descending order
+            driversOrdered = driversOrdered.OrderByDescending(d => d.LapDistPct).ToList();
+
+            //return list
+            return driversOrdered;
         }
+
+        private void AddPlaceholders(int DriverIdx, List<(int CarIdx, float LapDistPct)> driversOrdered, int playerIndex)
+        {
+
+            //how many placeholders should be added
+            int range = 3 - playerIndex;
+
+            //if range less than 0 make it 0
+            if (range < 0) { range = 0; }
+
+            //Decides if placeholders are needed
+            if (range > 0)
+            {
+                //Dispatch to different thread
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    //loops for amount necessary
+                    for (int x = 0; x < range; x++)
+                    {
+                        // Add placeholders for empty spaces
+                        _referenceWindow.Placeholder();
+                    }
+                });
+            }
+        }
+
+        private int GetAvgLap(IRacingSdkSessionInfo.DriverInfoModel.DriverModel driverInfo, List<(int CarIdx, float LapDistPct)> driversOrdered)
+        {
+            //average lap time
+            float avglaptime = 0;
+            var count = 0;
+
+
+            //calculate avglaptime
+            for (int i = 0; i < driversOrdered.Count; i++)
+            {
+                //temp variable to get info froom the list
+                (var temp1, var temp2) = driversOrdered[i];
+                //last lap of the car
+                var lastlap = irsdk.Data.GetFloat("CarIdxLastLapTime", temp1);
+
+                //check if in the pits
+                var inPits = irsdk.Data.GetBool("CarIdxOnPitRoad", temp1);
+
+                //disregard car if in pits
+                if (inPits == false)
+                {
+                    count = count + 1;
+
+                    //checks if there is a last lap
+                    if (lastlap != -1)
+                    {
+                        avglaptime = avglaptime + lastlap;
+                    }
+                    //get car class default lap time
+                    else
+                    {
+                        avglaptime = avglaptime + driverInfo.CarClassEstLapTime;
+                    }
+                }
+            }
+
+            //finally calculate the value
+            avglaptime = avglaptime / count;
+
+            //return value
+            return (int)avglaptime;
+        }
+
+        private (double, int) GetDelta(int carIdx, int avglaptime, float DriverLapTime, int i)
+        {
+            //lap dist pct of current car
+            var lapDistPct = irsdk.Data.GetFloat("CarIdxLapDistPct", carIdx);
+
+            //estimated lap time
+            var estLapTime = lapDistPct * avglaptime;
+
+
+
+            double delta = estLapTime - DriverLapTime;
+
+
+            //lap offset for lap calculations later
+            var lapOffset = 0;
+
+            //fix delta if they are on different laps
+
+            //if delta is negative and driver is on a later lap
+            if (i < 3 && delta < 0)
+            {
+                lapOffset = -1;
+                delta = avglaptime - DriverLapTime + estLapTime;
+            }
+
+            //if delta is positive and driver is on an earlier lap
+            if (i > 3 && delta > 0)
+            {
+                lapOffset = 1;
+                delta = estLapTime - (avglaptime + DriverLapTime);
+            }
+
+            //round delta to 1 decimal point
+            delta = Math.Round(delta, 1);
+
+            //return values
+            return (delta, lapOffset);
+        }
+
+        #endregion
 
         #endregion
 

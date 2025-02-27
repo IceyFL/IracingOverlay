@@ -37,7 +37,7 @@
                 Margin="297,0,0,0">
             <Label Name="SafetyRating"
                        Content="4.9"
-                       Foreground="Gray"
+                       Foreground="#111111"
                        FontSize="14"
                        FontWeight="Bold"
                        VerticalAlignment="Center"

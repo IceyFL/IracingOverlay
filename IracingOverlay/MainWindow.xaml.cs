@@ -28,6 +28,8 @@ namespace IracingOverlay
 
         bool IsReferenceChecked = false;
 
+        bool connected = false;
+
         private Reference _referenceWindow;
 
         private IRacingSdk irsdk;
@@ -58,8 +60,7 @@ namespace IracingOverlay
         private void ReferenceChecked(object sender, RoutedEventArgs e)
         {
             _referenceWindow = new Reference();
-            _referenceWindow.Show();
-            ReferenceWindowOpen = true;
+            ReferenceWindowOpen = false;
             IsReferenceChecked = true;
         }
 
@@ -94,11 +95,29 @@ namespace IracingOverlay
 
         private void OnConnected()
         {
+            connected = true;
+            if (_referenceWindow != null && IsReferenceChecked)
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    _referenceWindow.Show();
+                });
+                ReferenceWindowOpen = true;
+            }
             Debug.WriteLine("OnConnected() fired!");
         }
 
         private void OnDisconnected()
         {
+            connected = false;
+            if (_referenceWindow != null)
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    _referenceWindow.Hide();
+                });
+                ReferenceWindowOpen = false;
+            }
             Debug.WriteLine("OnDisconnected() fired!");
         }
 
@@ -129,6 +148,7 @@ namespace IracingOverlay
         {
             if (ReferenceWindowOpen)
             {
+                Debug.WriteLine("1");
                 //initialize caridx
                 int carIdx = 0;
 
@@ -221,6 +241,14 @@ namespace IracingOverlay
                         }
                     }
                 }
+            }
+            else if (_referenceWindow != null && connected)
+            {
+                Application.Current.Dispatcher.Invoke(() =>
+                {
+                    _referenceWindow.Show();
+                    ReferenceWindowOpen = true;
+                });
             }
         }
 

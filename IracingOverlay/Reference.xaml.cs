@@ -18,10 +18,10 @@ namespace IracingOverlay
             InitializeComponent();
         }
 
-        public void AddDriver(string position, string drivername, string safetyrating, string licenselevel, string irating, string delta, SolidColorBrush TextColor) {
+        public void AddDriver(string position, string drivername, string safetyrating, string licenselevel, string irating, string delta, SolidColorBrush TextColor, Color BackgroundColor) {
 
             //create a reference user object
-            var Driver = new ReferenceUser(position, drivername, safetyrating, licenselevel, irating, delta, TextColor);
+            var Driver = new ReferenceUser(position, drivername, safetyrating, licenselevel, irating, delta, TextColor, BackgroundColor);
 
             //add it to the UI
             elements.Add(Driver);

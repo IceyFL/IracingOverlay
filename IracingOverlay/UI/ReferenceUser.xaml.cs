@@ -11,7 +11,7 @@ namespace IracingOverlay.UI
     /// </summary>
     public partial class ReferenceUser : UserControl
     {
-        public ReferenceUser(string position, string name, string safetyRating, string licenseLevel, string iRating, string delta, SolidColorBrush TextColor)
+        public ReferenceUser(string position, string name, string safetyRating, string licenseLevel, string iRating, string delta, SolidColorBrush TextColor, Color BackgroundColor)
         {
             InitializeComponent();
             Position.Content = position;
@@ -36,6 +36,9 @@ namespace IracingOverlay.UI
 
             // Set the background color
             LicenseLevel.Background = new SolidColorBrush(licenseLevelColor);
+
+            //set background color of entire element
+            backgroundThing.Background = new SolidColorBrush(BackgroundColor);
 
 
         }

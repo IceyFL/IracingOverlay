@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Xml.Linq;
 using IracingOverlay.UI;
 
 /// Import the IRSDKSharper library
@@ -29,6 +30,12 @@ namespace IracingOverlay
         bool IsReferenceChecked = false;
 
         bool connected = false;
+
+        List<(int CarIdx, float LapDistPct)> CarOrderPrevious = new List<(int CarIdx, float LapDistPct)>();
+
+        //save gained and lost positions
+        List<(int CarIdx, int count)> gained = new List<(int CarIdx, int count)>();
+        List<(int CarIdx, int count)> lost = new List<(int CarIdx, int count)>();
 
         private Reference _referenceWindow;
 
@@ -142,13 +149,16 @@ namespace IracingOverlay
             Debug.WriteLine(message);
         }
 
+
+
+        #endregion
+
         #region Relative
 
         private void RunRelative()
         {
             if (ReferenceWindowOpen)
             {
-                Debug.WriteLine("1");
                 //initialize caridx
                 int carIdx = 0;
 
@@ -177,7 +187,7 @@ namespace IracingOverlay
                     int playerIndex = driversOrdered.FindIndex(d => d.CarIdx == DriverIdx);
 
                     AddPlaceholders(DriverIdx, driversOrdered, playerIndex);
-                    
+
 
                     //create driverInfo variable
                     var driverInfo = irsdk.Data.SessionInfo.DriverInfo.Drivers.FirstOrDefault(d => d.CarIdx == DriverIdx);
@@ -223,8 +233,11 @@ namespace IracingOverlay
                                 decimal iRating = Math.Round((decimal)driverInfo.IRating / 1000, 1); // iRating
 
                                 //position
+
                                 var carPosition = irsdk.Data.GetInt("CarIdxPosition", carIdx);
 
+                                //change color if gained/lost positions
+                                Color BackgroundColor = GetBackgroundColor(carIdx, driversOrdered);
 
                                 //get text color using function
                                 Color TextColor = DecideTextColor(carIdx, DriverIdx, lapoffset);
@@ -234,12 +247,14 @@ namespace IracingOverlay
                                 {
 
                                     //add driver to UI
-                                    _referenceWindow.AddDriver("P" + carPosition.ToString(), driverName, SafetyRating.ToString(), LicenseLevel, iRating.ToString(), delta.ToString(), new SolidColorBrush(TextColor));
+                                    _referenceWindow.AddDriver("P" + carPosition.ToString(), driverName.ToString(), SafetyRating.ToString(), LicenseLevel, iRating.ToString(), delta.ToString(), new SolidColorBrush(TextColor), BackgroundColor);
                                 });
 
                             }
                         }
                     }
+                    //update new positions to old positions list
+                    CarOrderPrevious = driversOrdered;
                 }
             }
             else if (_referenceWindow != null && connected)
@@ -443,9 +458,75 @@ namespace IracingOverlay
             return (delta, lapOffset);
         }
 
-        #endregion
+        private Color GetBackgroundColor(int CarIdx, List<(int CarIdx, float LapDistPct)> driversOrdered)
+        {
+            //default color
+            Color BackgroundColor = Color.FromArgb(0x33, 0xff, 0xff, 0xff);
+
+            if (CarOrderPrevious.Count > 0)
+            {
+                //initialize variable
+                bool positionChanged = false;
+
+                //check if in either list already
+                var gainedEntry = gained.FirstOrDefault(x => x.CarIdx == CarIdx);
+                var lostEntry = lost.FirstOrDefault(x => x.CarIdx == CarIdx);
+
+
+                //new index and previous
+                int oldIndex = CarOrderPrevious.FindIndex(d => d.CarIdx == CarIdx);
+                int newIndex = driversOrdered.FindIndex(d => d.CarIdx == CarIdx);
+
+                //gained position
+                if (oldIndex > newIndex)
+                {
+                    gained.Add((CarIdx, 10));
+                    BackgroundColor = Color.FromArgb(0x77, 0x00, 0xff, 0x00);
+                    positionChanged = true;
+                }
+                //lost position
+                else if (oldIndex < newIndex)
+                {
+                    lost.Add((CarIdx, 10));
+                    BackgroundColor = Color.FromArgb(0x77, 0xff, 0x00, 0x00);
+                    positionChanged = true;
+                }
+
+
+                //remove one from its value if already in list
+                if (gainedEntry.CarIdx != 0)
+                {
+                    var updatedEntry = (gainedEntry.CarIdx, gainedEntry.count - 1);
+                    //update entry
+                    gained.Remove(gainedEntry);
+                    if (positionChanged)
+                    {
+                        gained.Add(updatedEntry);
+                    }
+
+                    BackgroundColor = Color.FromArgb(0x77, 0x00, 0xff, 0x00);
+                }
+                else if (lostEntry.CarIdx != 0)
+                {
+                    var updatedEntry = (lostEntry.CarIdx, lostEntry.count - 1);
+                    //update entry
+                    lost.Remove(lostEntry);
+                    if (positionChanged)
+                    {
+                        gained.Add(updatedEntry);
+                    }
+
+                    BackgroundColor = Color.FromArgb(0x77, 0xff, 0x00, 0x00);
+                }
+
+
+            }
+
+            //default color
+            return BackgroundColor;
+        }
+
 
         #endregion
-
     }
 }

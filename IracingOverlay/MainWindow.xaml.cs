@@ -26,7 +26,7 @@ namespace IracingOverlay
     {
         bool ReferenceWindowOpen = false;
 
-        public bool IsReferenceChecked { get; set; }
+        bool IsReferenceChecked = false;
 
         private Reference _referenceWindow;
 
@@ -60,6 +60,7 @@ namespace IracingOverlay
             _referenceWindow = new Reference();
             _referenceWindow.Show();
             ReferenceWindowOpen = true;
+            IsReferenceChecked = true;
         }
 
         private void ReferenceUnchecked(object sender, RoutedEventArgs e)
@@ -70,6 +71,7 @@ namespace IracingOverlay
                 _referenceWindow = null;
                 ReferenceWindowOpen = false;
             }
+            IsReferenceChecked = false;
         }
 
         #region EventHandlers
@@ -78,6 +80,10 @@ namespace IracingOverlay
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
+            if (ReferenceWindowOpen)
+            {
+                _referenceWindow.Close();
+            }
             irsdk.Stop();
         }
 

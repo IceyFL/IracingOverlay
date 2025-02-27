@@ -47,8 +47,8 @@ namespace IracingOverlay
             irsdk.OnStopped += OnStopped;
             irsdk.OnDebugLog += OnDebugLog;
 
-            // this means fire the OnTelemetryData event every 30 data frames (2 times a second)
-            irsdk.UpdateInterval = 30;
+            // this means fire the OnTelemetryData event every 12 data frames (5 times a second)
+            irsdk.UpdateInterval = 12;
 
             // lets go!
             irsdk.Start();
@@ -187,24 +187,38 @@ namespace IracingOverlay
                         });
                     }
 
+                    var driverInfo = irsdk.Data.SessionInfo.DriverInfo.Drivers.FirstOrDefault(d => d.CarIdx == DriverIdx);
+
                     //average lap time
                     float avglaptime = 0;
                     var count = 0;
 
-                    for (int i = 0; i < 8; i++)
+                    for (int i = 0; i < driversOrdered.Count; i++)
                     {
-                        //check exists
-                        int carIndex = i + playerIndex - 3;
-                        if (carIndex >= 0 && carIndex < driversOrdered.Count)
+                        count = count + 1;
+                        (var temp1, var temp2) = driversOrdered[i];
+                        var lastlap = irsdk.Data.GetFloat("CarIdxLastLapTime", temp1);
+
+                        //check if in the pits
+                        var inPits = irsdk.Data.GetBool("CarIdxOnPitRoad", carIdx);
+
+                        if (inPits == false)
                         {
-                            count = count + 1;
-                            (var temp1, var temp2) = driversOrdered[carIndex];
-                            avglaptime = avglaptime + (irsdk.Data.GetFloat("CarIdxEstTime", temp1) / irsdk.Data.GetFloat("CarIdxLapDistPct", temp1));
+                            //checks if there is a last lap
+                            if (lastlap != -1)
+                            {
+                                avglaptime = avglaptime + lastlap;
+                            }
+                            else
+                            {
+                                avglaptime = avglaptime + driverInfo.CarClassEstLapTime;
+                            }
                         }
                     }
 
 
                     avglaptime = avglaptime / count;
+                    avglaptime = (int)avglaptime;
 
 
                     //DriverLapTime for delta
@@ -255,14 +269,14 @@ namespace IracingOverlay
                             if (i > 3 && delta > 0)
                             {
                                 lapOffset = 1;
-                                delta = estLapTime - avglaptime + DriverLapTime;
+                                delta = estLapTime - (avglaptime + DriverLapTime);
                             }
 
                             //use est and percent to get delta
                             delta = Math.Round(delta, 1);
 
                             // Retrieve the driver information
-                            var driverInfo = irsdk.Data.SessionInfo.DriverInfo.Drivers.FirstOrDefault(d => d.CarIdx == carIdx);
+                            driverInfo = irsdk.Data.SessionInfo.DriverInfo.Drivers.FirstOrDefault(d => d.CarIdx == carIdx);
 
                             if (driverInfo != null)
                             {
@@ -286,14 +300,23 @@ namespace IracingOverlay
                                 var driverlap = irsdk.Data.GetInt("CarIdxLap", DriverIdx);
                                 var currentlap = irsdk.Data.GetInt("CarIdxLap", carIdx);
 
+
                                 //adjust for lap offset
                                 currentlap += lapOffset;
+
+                                //is car in pits
+                                var inPits = irsdk.Data.GetBool("CarIdxOnPitRoad", carIdx);
 
 
                                 //check if its the driver
                                 if (carIdx == DriverIdx)
                                 {
                                     TextColor = Colors.Gold;
+                                }
+
+                                else if (inPits)
+                                {
+                                    TextColor = Colors.DarkGray;
                                 }
 
                                 //red if car is lapping driver
@@ -305,9 +328,8 @@ namespace IracingOverlay
                                 //light blue if driver is lapping car
                                 else if (currentlap < driverlap)
                                 {
-                                    TextColor = Colors.LightBlue;
+                                    TextColor = Colors.SkyBlue;
                                 }
-
 
 
                                 Application.Current.Dispatcher.Invoke(() =>

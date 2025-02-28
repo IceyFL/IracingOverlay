@@ -5,14 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:IracingOverlay"
         mc:Ignorable="d"
-        Title="Reference" Height="250" Width="500"
+        Title="Reference" Height="300" Width="500"
         WindowStyle="None"
         AllowsTransparency="True"
         MouseLeftButtonDown="Window_MouseLeftButtonDown"
         Topmost="True"
         Background="#aa000000">
-        <Grid >
-			<Grid>
+    <Grid>
+        <Grid Margin="0,25,0,25" >
 				<StackPanel x:Name="mainGrid" Orientation="Vertical">
 				</StackPanel>
 			</Grid>

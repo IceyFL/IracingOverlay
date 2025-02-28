@@ -17,17 +17,29 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Xml.Linq;
 using IracingOverlay.UI;
+using System.Text.Json;
 
 /// Import the IRSDKSharper library
 using IRSDKSharper;
 
 namespace IracingOverlay
 {
+    public class Settings
+    {
+        public bool IsReferenceChecked { get; set; }
+        public int ReferenceWindowLocationX { get; set; }
+        public int ReferenceWindowLocationY { get; set; }
+    }
+
     public partial class MainWindow : Window
     {
         bool ReferenceWindowOpen = false;
 
+        //variables for saving/loading
+        string filepath = "config.json";
         bool IsReferenceChecked = false;
+        int ReferenceWindowLocationX = 0;
+        int ReferenceWindowLocationY = 0;
 
         bool connected = false;
 
@@ -44,6 +56,18 @@ namespace IracingOverlay
         public MainWindow()
         {
             InitializeComponent();
+
+            Settings settings = LoadSettings(filepath);
+
+            IsReferenceChecked = settings.IsReferenceChecked;
+            ReferenceWindowLocationX = settings.ReferenceWindowLocationX;
+            ReferenceWindowLocationY = settings.ReferenceWindowLocationY;
+
+            if (IsReferenceChecked)
+            {
+                //load variables
+                ReferenceCheckbox.IsChecked = true;
+            }
 
             // create an instance of IRacingSdk
             irsdk = new IRacingSdk();
@@ -67,6 +91,8 @@ namespace IracingOverlay
         private void ReferenceChecked(object sender, RoutedEventArgs e)
         {
             _referenceWindow = new Reference();
+            _referenceWindow.Top = ReferenceWindowLocationY;
+            _referenceWindow.Left = ReferenceWindowLocationX;
             ReferenceWindowOpen = false;
             IsReferenceChecked = true;
         }
@@ -75,6 +101,8 @@ namespace IracingOverlay
         {
             if (_referenceWindow != null)
             {
+                ReferenceWindowLocationX = (int)_referenceWindow.Left;
+                ReferenceWindowLocationY = (int)_referenceWindow.Top;
                 _referenceWindow.Close();
                 _referenceWindow = null;
                 ReferenceWindowOpen = false;
@@ -82,18 +110,40 @@ namespace IracingOverlay
             IsReferenceChecked = false;
         }
 
-        #region EventHandlers
+        static void SaveSettings(Settings settings, string filePath)
+        {
+            string jsonString = JsonSerializer.Serialize(settings);
+            File.WriteAllText(filePath, jsonString);
+        }
 
-        //debugging stuff
+        static Settings LoadSettings(string filePath)
+        {
+            if (File.Exists(filePath))
+            {
+                string jsonString = File.ReadAllText(filePath);
+                return JsonSerializer.Deserialize<Settings>(jsonString);
+            }
+            return new Settings();
+
+
+            #region EventHandlers
+
+            //debugging stuff
+        }
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
             if (IsReferenceChecked)
             {
+                ReferenceWindowLocationX = (int)_referenceWindow.Left;
+                ReferenceWindowLocationY = (int)_referenceWindow.Top;
                 _referenceWindow.Close();
             }
+            Settings settings = new Settings { IsReferenceChecked = IsReferenceChecked, ReferenceWindowLocationX = ReferenceWindowLocationX, ReferenceWindowLocationY = ReferenceWindowLocationY };
+            SaveSettings(settings, filepath);
             irsdk.Stop();
         }
+
 
         private void OnException(Exception exception)
         {

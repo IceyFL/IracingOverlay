@@ -41,6 +41,9 @@ namespace IracingOverlay
         int ReferenceWindowLocationX = 0;
         int ReferenceWindowLocationY = 0;
 
+        //strength of field
+        int Sof = 0;
+
         bool connected = false;
 
         List<(int CarIdx, float LapDistPct)> CarOrderPrevious = new List<(int CarIdx, float LapDistPct)>();
@@ -297,7 +300,7 @@ namespace IracingOverlay
                                 {
 
                                     //add driver to UI
-                                    _referenceWindow.AddDriver("P" + carPosition.ToString(), driverName.ToString(), SafetyRating.ToString(), LicenseLevel, iRating.ToString() + "k", delta.ToString(), new SolidColorBrush(TextColor), BackgroundColor);
+                                    _referenceWindow.AddDriver("P" + carPosition.ToString(), driverName.ToString(), SafetyRating.ToString(), LicenseLevel, iRating.ToString() + "k", delta.ToString(), new SolidColorBrush(TextColor), BackgroundColor, Sof.ToString());
                                 });
 
                             }
@@ -432,10 +435,21 @@ namespace IracingOverlay
             float avglaptime = 0;
             var count = 0;
 
+            var SoFCount = 0;
+            Sof = 0;
+
 
             //calculate avglaptime
             for (int i = 0; i < driversOrdered.Count; i++)
             {
+                //get the total irating
+                var tempdriver = irsdk.Data.SessionInfo.DriverInfo.Drivers.FirstOrDefault(d => d.CarIdx == i);
+                if (tempdriver.IsSpectator == 0 && tempdriver.CarIsPaceCar == 0)
+                {
+                    Sof = Sof + tempdriver.IRating;
+                    SoFCount = SoFCount + 1;
+                }
+
                 //temp variable to get info froom the list
                 (var temp1, var temp2) = driversOrdered[i];
                 //last lap of the car
@@ -462,8 +476,17 @@ namespace IracingOverlay
                 }
             }
 
+            //calculate strength of field
+            if (SoFCount > 0)
+            {
+                Sof = Sof / SoFCount;
+            }
+
             //finally calculate the value
-            avglaptime = avglaptime / count;
+            if (count > 0)
+            {
+                avglaptime = avglaptime / count;
+            }
 
             //return value
             return (int)avglaptime;

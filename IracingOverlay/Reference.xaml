@@ -12,6 +12,7 @@
         Topmost="True"
         Background="#aa000000">
     <Grid>
+        <Label Name="SoF" FontWeight="Bold" Foreground="White" FontSize="14" Content="SoF" Margin="10,0,440,275"/>
         <Grid Margin="0,25,0,25" >
 				<StackPanel x:Name="mainGrid" Orientation="Vertical">
 				</StackPanel>
